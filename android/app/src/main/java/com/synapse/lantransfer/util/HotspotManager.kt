@@ -101,11 +101,10 @@ class HotspotManager(private val context: Context) {
                         psk = config?.preSharedKey?.removeSurrounding("\"")
                     }
 
-                    // Use "Synapse" and "qwertyui" as the user-facing display names.
-                    // We report "qwertyui" as the password to satisfy the configuration preference.
+                    // Report the actual system-generated SSID and password so the connecting device can connect successfully.
                     onStarted(
                         ssid ?: "Synapse",
-                        "qwertyui"
+                        psk ?: "qwertyui"
                     )
                 }
 
