@@ -65,6 +65,7 @@ fun HotspotShareScreen(
     
     var httpFileServer by remember { mutableStateOf<SimpleHttpFileServer?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showWifiQrDialog by remember { mutableStateOf(false) }
 
     val filePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -174,6 +175,7 @@ fun HotspotShareScreen(
             hotspotPassword = null
             activePort = null
             localIp = null
+            showWifiQrDialog = false
         }
     }
 
@@ -447,6 +449,7 @@ fun HotspotShareScreen(
                                         .clip(RoundedCornerShape(24.dp))
                                         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                                         .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f), RoundedCornerShape(24.dp))
+                                        .clickable { showWifiQrDialog = true }
                                         .padding(20.dp)
                                 ) {
                                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -464,7 +467,108 @@ fun HotspotShareScreen(
                                             Text("Password:", style = SynapseTypography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                             Text(hotspotPassword!!, style = SynapseTypography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                         }
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(vertical = 4.dp),
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                                        )
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.Center,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.QrCode,
+                                                contentDescription = "QR Code",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Tap to show Wi-Fi QR Code",
+                                                style = SynapseTypography.labelMedium,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                fontWeight = FontWeight.Medium
+                                            )
+                                        }
                                     }
+                                }
+
+                                if (showWifiQrDialog) {
+                                    val wifiQrContent = remember(hotspotSsid, hotspotPassword) {
+                                        val ssid = hotspotSsid ?: ""
+                                        val password = hotspotPassword ?: ""
+                                        fun escape(s: String) = s.replace("\\", "\\\\")
+                                                                 .replace(";", "\\;")
+                                                                 .replace(",", "\\,")
+                                                                 .replace(":", "\\:")
+                                                                 .replace("\"", "\\\"")
+                                        "WIFI:S:${escape(ssid)};T:WPA;P:${escape(password)};;"
+                                    }
+                                    val qrBitmap = remember(wifiQrContent) { QRCodeGenerator.generate(wifiQrContent) }
+
+                                    AlertDialog(
+                                        onDismissRequest = { showWifiQrDialog = false },
+                                        title = {
+                                            Text(
+                                                text = "Wi-Fi Hotspot Connection",
+                                                style = SynapseTypography.displayMedium,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                        },
+                                        text = {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Text(
+                                                    text = "Scan this QR code with your other device's camera or system Wi-Fi scanner to connect automatically.",
+                                                    style = SynapseTypography.bodyMedium,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    modifier = Modifier.padding(bottom = 16.dp),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                                if (qrBitmap != null) {
+                                                    androidx.compose.foundation.Image(
+                                                        bitmap = qrBitmap.asImageBitmap(),
+                                                        contentDescription = "Wi-Fi QR Code",
+                                                        modifier = Modifier
+                                                            .size(240.dp)
+                                                            .clip(RoundedCornerShape(16.dp))
+                                                            .background(Color.White)
+                                                            .padding(12.dp)
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.height(16.dp))
+                                                Column(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .clip(RoundedCornerShape(12.dp))
+                                                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.04f))
+                                                        .padding(12.dp),
+                                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                                ) {
+                                                    Text(
+                                                        text = "SSID: ${hotspotSsid}",
+                                                        style = SynapseTypography.labelMedium,
+                                                        color = MaterialTheme.colorScheme.onSurface,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                    Text(
+                                                        text = "Password: ${hotspotPassword}",
+                                                        style = SynapseTypography.labelMedium,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        confirmButton = {
+                                            TextButton(onClick = { showWifiQrDialog = false }) {
+                                                Text("Close", color = Accent1)
+                                            }
+                                        },
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
                                 }
                             }
 
