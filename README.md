@@ -19,9 +19,13 @@
 
 
 #  Synapse
-Synapse is a high-performance, peer-to-peer file transfer system designed for Local Area Networks. It combines a premium desktop interface built with React and Wails v2 into a single native binary, alongside a modern native Android client built with Jetpack Compose. 
+Synapse is a high-performance, peer-to-peer file transfer system designed for Local Area Networks. It combines a premium desktop interface built with React and Wails v2 into a single native binary.
 
-The system leverages zero-configuration mDNS device discovery, instant QR Code pairing, and offline Wi-Fi hotspot sharing. All peer-to-peer transfers are fully encrypted end-to-end via TLS with ephemeral certificates, ensuring fast and secure file sharing across all your devices.
+The system leverages zero-configuration mDNS device discovery, instant QR Code pairing, and offline Wi-Fi hotspot sharing. All peer-to-peer transfers are fully encrypted end-to-end via TLS with ephemeral certificates and checked for integrity via SHA-256 verification.
+
+> [!IMPORTANT]
+> ## Development Note
+> This project was developed using Large Language Models (LLMs) and AI-assisted workflows, with rapid iterative prototyping. Synapse is meant to be a practical prototype and learning project, not a fully polished production product yet. It is still experimental, so expect bugs, rough edges, incomplete features, and unexpected behavior as the software evolves.
 
 ### 💻 Desktop Interface
 <table>
@@ -53,7 +57,7 @@ The system leverages zero-configuration mDNS device discovery, instant QR Code p
 - **🖥️ Native Desktop GUI** — Premium dark-mode interface built with React, Vite, and Framer Motion on Wails v2. Single binary footprint.
 - **📱 Native Android Client** — Elegant Material design app built using Jetpack Compose, featuring smooth micro-animations and clean layouts.
 - **🔍 Zero Configuration** — Automatic peer discovery on local networks using mDNS. No IP addresses or setup needed.
-- **📷 QR Code Instant Pairing** — Connect instantly by scanning the sender's generated QR code. Uses an optimized, stride-aligned CameraX implementation for robust, freeze-free real-time scanning.
+- **📷 QR Code Instant Pairing** — Connect instantly by scanning the sender's generated QR code. Uses an optimized, stride-aligned CameraX implementation for robust, freeze-free real-time scan support.
 - **🚀 Wi-Fi Hotspot Direct Share** — Share files offline with no network router. The app launches an access point with default display credentials (SSID `Synapse` / Password `qwertyui`).
 - **🌐 Universal Web Browser Access** — Any device (iOS, macOS, Windows, Linux) can download shared files without installing the Synapse app by visiting a local web portal (e.g. `http://<ip>:8080`).
 - **🔒 End-to-End Encrypted** — Secure socket transmissions using TLS with ephemeral self-signed certificates.
